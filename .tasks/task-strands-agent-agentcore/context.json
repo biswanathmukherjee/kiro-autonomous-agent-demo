@@ -1,0 +1,28 @@
+{
+  "project_type": "Python Strands Agents SDK project deployable to Bedrock AgentCore",
+  "language": "Python 3.11",
+  "build_system": "uv for dependency management, Docker for container builds",
+  "test_framework": "pytest",
+  "build_command": "cd /projects/sandbox/kiro-autonomous-agent-demo && uv sync",
+  "test_command": "cd /projects/sandbox/kiro-autonomous-agent-demo && uv run pytest tests/ -v",
+  "verification_instructions": "1. Run uv sync to install dependencies. 2. Run uv run pytest tests/ -v to run tests. 3. Run uv run ruff check . to lint. 4. Optionally run uv run python -c 'from agent import app; print(app)' to verify import.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "1. cd /projects/sandbox/kiro-autonomous-agent-demo. 2. uv init --python 3.11 (if not already done). 3. uv add strands-agents strands-agents-tools bedrock-agentcore fastapi 'uvicorn[standard]' pydantic httpx. 4. uv add --dev pytest ruff.",
+  "environment_constraints": "OPEN_INTERNET network mode. Python 3.11 via pyenv. uv, pytest, ruff available. No AWS credentials available so agent cannot actually be invoked end-to-end, but code structure and local HTTP server testing are feasible.",
+  "contribution_requirements": "MIT license. Repo is essentially empty so we are greenfield.",
+  "key_patterns": "Strands SDK: Agent() class with tools parameter, @tool decorator for custom tools. AgentCore: Two deployment paths - (A) SDK Integration using bedrock-agentcore with BedrockAgentCoreApp + @app.entrypoint decorator, or (B) Custom FastAPI with /invocations POST and /ping GET endpoints. Both require ARM64 Docker containers on port 8080. The SDK path is simpler; Custom path gives full control. We will implement BOTH approaches as examples.",
+  "relevant_files": [
+    "README.md",
+    "LICENSE",
+    "agent.py (to be created - main agent code with custom tools)",
+    "agent_agentcore_sdk.py (to be created - SDK integration deployment entrypoint)",
+    "agent_agentcore_custom.py (to be created - Custom FastAPI deployment entrypoint)",
+    "tools/ (to be created - custom tools directory)",
+    "pyproject.toml (to be created by uv init)",
+    "Dockerfile (to be created - ARM64 container for AgentCore)",
+    "deploy/deploy_agent.py (to be created - boto3 deployment script)",
+    "deploy/invoke_agent.py (to be created - boto3 invocation script)",
+    "tests/ (to be created - unit tests)"
+  ],
+  "directory_structure": "Root: agent code, config, Dockerfile. tools/: custom tool implementations. deploy/: deployment and invocation scripts. tests/: pytest unit tests."
+}
