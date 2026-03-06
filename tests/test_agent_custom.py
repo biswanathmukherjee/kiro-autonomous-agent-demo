@@ -22,7 +22,10 @@ def test_ping(mock_create_agent):
 def test_invocations_valid_prompt(mock_agent):
     """Test the invocations endpoint with a valid prompt."""
     mock_result = MagicMock()
-    mock_result.message = "The weather in Tokyo is sunny."
+    mock_result.message = {
+        "role": "assistant",
+        "content": [{"text": "The weather in Tokyo is sunny."}],
+    }
     mock_agent.return_value = mock_result
 
     import agent_agentcore_custom

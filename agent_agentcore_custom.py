@@ -47,9 +47,21 @@ def invocations(request: InvocationRequest):
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
     result = agent(prompt)
+    message = result.message
+    if isinstance(message, dict):
+        content = message.get("content", [])
+        text_parts = [
+            block["text"]
+            for block in content
+            if isinstance(block, dict) and "text" in block
+        ]
+        output_text = "\n".join(text_parts) if text_parts else str(message)
+    else:
+        output_text = str(message)
+
     return InvocationResponse(
         output=InvocationOutput(
-            message=result.message,
+            message=output_text,
             timestamp=datetime.now(timezone.utc).isoformat(),
             model="strands-agent",
         )
