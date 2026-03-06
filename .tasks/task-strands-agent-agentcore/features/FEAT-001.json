@@ -1,0 +1,34 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Set up the complete Strands agent project with custom tools, two AgentCore deployment entrypoints (SDK integration and Custom FastAPI), Dockerfile, deployment scripts, unit tests, and README documentation.",
+  "status": "in_progress",
+  "steps": [
+    "Step 1 - Initialize the project with uv: Run 'uv init --python 3.11' in /projects/sandbox/kiro-autonomous-agent-demo. Then add dependencies: strands-agents, strands-agents-tools, bedrock-agentcore, fastapi, 'uvicorn[standard]', pydantic, httpx. Add dev dependencies: pytest, ruff. This creates pyproject.toml and uv.lock.",
+    "Step 2 - Create custom tools in tools/__init__.py and tools/weather.py: Implement a 'get_weather' tool using the @tool decorator from strands that returns mock weather data for a given city. Also create tools/calculator.py with a 'calculate' tool that evaluates simple math expressions. These demonstrate the custom tool pattern.",
+    "Step 3 - Create the core agent module agent.py: Define a function create_agent() that creates and returns a Strands Agent configured with a system prompt ('You are a helpful AI assistant with access to weather and calculator tools.'), the custom tools from tools/, and the default BedrockModel provider. Import from strands and from the local tools package.",
+    "Step 4 - Create agent_agentcore_sdk.py (SDK Integration entrypoint): This uses the bedrock-agentcore SDK approach. Import BedrockAgentCoreApp from bedrock_agentcore.runtime, import create_agent from agent.py. Create app = BedrockAgentCoreApp(), instantiate the agent, decorate an invoke(payload) function with @app.entrypoint that extracts payload['prompt'] and calls agent(user_message), returning {'result': result.message}. Add if __name__ == '__main__': app.run().",
+    "Step 5 - Create agent_agentcore_custom.py (Custom FastAPI entrypoint): This implements the custom deployment approach. Create a FastAPI app with: (a) POST /invocations endpoint accepting {'input': {'prompt': '...'}} and returning {'output': {'message': result.message, 'timestamp': ..., 'model': 'strands-agent'}}, (b) GET /ping endpoint returning {'status': 'healthy'}. Use Pydantic models for request/response validation. Import create_agent from agent.py. Add if __name__ == '__main__': uvicorn.run(app, host='0.0.0.0', port=8080).",
+    "Step 6 - Create Dockerfile: Use 'FROM --platform=linux/arm64 ghcr.io/astral-sh/uv:python3.11-bookworm-slim' as base. WORKDIR /app. COPY pyproject.toml and uv.lock, RUN uv sync --frozen --no-cache. COPY all source files (agent.py, agent_agentcore_sdk.py, agent_agentcore_custom.py, tools/). EXPOSE 8080. Default CMD uses the SDK entrypoint: CMD [\"uv\", \"run\", \"python\", \"agent_agentcore_sdk.py\"]. Add comments showing how to switch to the custom FastAPI entrypoint.",
+    "Step 7 - Create deploy/deploy_agent.py: A boto3 script that creates an AgentCore Runtime using bedrock-agentcore-control client. Include placeholder values for containerUri and roleArn with clear TODO comments. Print the ARN and status on success.",
+    "Step 8 - Create deploy/invoke_agent.py: A boto3 script that invokes a deployed AgentCore Runtime agent. Accept command-line arguments for agent ARN and prompt. Use bedrock-agentcore client's invoke_agent_runtime. Print the response.",
+    "Step 9 - Create tests/conftest.py with shared fixtures and tests/test_tools.py: Test the custom tools (get_weather returns expected structure, calculate returns correct results for valid expressions and handles errors). Create tests/test_agent_custom.py: Use FastAPI TestClient to test the /ping and /invocations endpoints of agent_agentcore_custom.py. Mock the Strands Agent to avoid needing actual AWS credentials. Verify /ping returns 200 with {'status': 'healthy'}, /invocations with valid prompt returns 200 with expected response structure, /invocations with missing prompt returns 400.",
+    "Step 10 - Update README.md: Write comprehensive documentation covering: project overview, prerequisites (Python 3.10+, AWS account, Docker), project structure, local development setup (uv sync, running locally), custom tools explanation, two deployment approaches (SDK Integration vs Custom FastAPI), Docker build instructions, AgentCore deployment steps, testing instructions (pytest), and links to Strands SDK docs and AgentCore docs.",
+    "Step 11 - Create a .gitignore file appropriate for Python projects: include __pycache__/, *.pyc, .venv/, .env, dist/, *.egg-info/, .pytest_cache/, .ruff_cache/."
+  ],
+  "acceptance_criteria": [
+    "Running 'uv sync' in the project root installs all dependencies without errors",
+    "Running 'uv run pytest tests/ -v' passes all tests (tools tests and FastAPI endpoint tests)",
+    "Running 'uv run ruff check .' reports no linting errors",
+    "The Dockerfile is valid and follows AgentCore requirements (ARM64, port 8080, /invocations and /ping endpoints)",
+    "README.md provides clear instructions for local development and AgentCore deployment",
+    "The project structure includes: agent.py, agent_agentcore_sdk.py, agent_agentcore_custom.py, tools/, deploy/, tests/, Dockerfile, pyproject.toml, README.md, .gitignore"
+  ],
+  "verification": [
+    "cd /projects/sandbox/kiro-autonomous-agent-demo && uv sync",
+    "cd /projects/sandbox/kiro-autonomous-agent-demo && uv run pytest tests/ -v",
+    "cd /projects/sandbox/kiro-autonomous-agent-demo && uv run ruff check ."
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

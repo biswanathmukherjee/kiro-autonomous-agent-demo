@@ -1,0 +1,7 @@
+{
+  "task_id": "task-strands-agent-agentcore",
+  "task_description": "Create a sample Strands Agents SDK project in Python with custom tools, deployable to AWS Bedrock AgentCore. Includes two deployment approaches (SDK Integration and Custom FastAPI), Dockerfile, deployment scripts, unit tests, and documentation.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001"],
+  "blocked_reason": null
+}
